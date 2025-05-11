@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: dept-mysql-config
 data:
-  mysql-url: jdbc:mysql://dept-mysql-service:27018/dept_db
+  dept-mysql-url: jdbc:mysql://dept-mysql-service:27018/dept_db
