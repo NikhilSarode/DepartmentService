@@ -1,51 +1,49 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webapp-deployment
+  name: dept-webapp-deployment
   labels:
-    app: webapp
+    app: dept-webapp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: webapp
+      app: dept-webapp
   template:
     metadata:
       labels:
-        app: webapp
+        app: dept-webapp
     spec:
       containers:
-        - name: webapp
-          image: nikhil575/helloworldtest:latest
+        - name: dept-webapp
+          image: nikhil575/departmentservice:latest
           ports:
             - containerPort: 8090
           env:
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secret
-                  key: mysql-user
+                  name: dept-mysql-secret
+                  key: dept-mysql-user
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secret
-                  key: mysql-password
+                  name: dept-mysql-secret
+                  key: dept-mysql-password
             - name: DB_URL
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-config
-                  key: mysql-url
+                  name: dept-mysql-config
+                  key: dept-mysql-url
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: webapp-service
+  name: dept-webapp-service
 spec:
-  type: NodePort
   selector:
-    app: webapp
+    app: dept-webapp
   ports:
     - protocol: TCP
-      port: 3000
+      port: 3001
       targetPort: 8090
-      nodePort: 30100

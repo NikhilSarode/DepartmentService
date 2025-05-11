@@ -12,7 +12,7 @@ spec:
           - sh
           - -c
           - |
-            mysql -h mysql-service -P 27017 -u root -proot -e "CREATE DATABASE IF NOT EXISTS demo_db;"
+            mysql -h mysql-service -P 27018 -u root -proot -e "CREATE DATABASE IF NOT EXISTS dept_db;"
         env:
           - name: MYSQL_PWD
             value: root
@@ -22,7 +22,7 @@ spec:
         command:
           - "liquibase"
           - "--driver=com.mysql.cj.jdbc.Driver"
-          - "--url=jdbc:mysql://mysql-service:27017/demo_db"
+          - "--url=jdbc:mysql://dept-mysql-service:27018/dept_db"
           - "--username=root"
           - "--password=root"
           - "--changeLogFile=changelog.xml"
@@ -30,11 +30,11 @@ spec:
           - "update"
         env:
           - name: DB_HOST
-            value: "mysql-service"
+            value: "dept-mysql-service"
           - name: DB_PORT
-            value: "27017"
+            value: "27018"
           - name: DB_NAME
-            value: "demo_db"
+            value: "dept_db"
           - name: DB_USERNAME
             value: "root"
           - name: DB_PASSWORD

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql-deployment
+  name: dept-mysql-deployment
   labels:
-    app: mysql
+    app: dept-mysql
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mysql
+      app: dept-mysql
   template:
     metadata:
       labels:
-        app: mysql
+        app: dept-mysql
     spec:
       containers:
-        - name: mysql
+        - name: dept-mysql
           image: mysql:8.3
           ports:
             - containerPort: 3306
@@ -23,17 +23,17 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-secret
-                  key: mysql-password
+                  name: dept-mysql-secret
+                  key: dept-mysql-password
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql-service
+  name: dept-mysql-service
 spec:
   selector:
-    app: mysql
+    app: dept-mysql
   ports:
     - protocol: TCP
-      port: 27017
+      port: 27018
       targetPort: 3306
