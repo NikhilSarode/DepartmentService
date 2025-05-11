@@ -1,0 +1,48 @@
+kubectl create configmap liquibase-changelog-configmap --from-file=changelog.xml=db/changelog/db.changelog-master.xml
+
+--To query mysql pod
+kubectl run mysql-client --rm -it --image=mysql:8 --restart=Never -- bash
+mysql -h dept-mysql-service -P 27018 -u root -p
+then do mysql commands
+
+
+To deploy in the cluster:-
+
+minikube start --driver=docker 		(only if not already started)
+kubectl apply -f k8s/dept-mysql-config.yaml
+kubectl apply -f k8s/dept-mysql-secret.yaml
+kubectl apply -f k8s/dept-mysql.yaml  	(wait for startup)
+kubectl apply -f k8s/dept-mysql-liquibase-job.yaml
+kubectl apply -f k8s/dept-webapp.yaml
+
+kubectl port-forward service/dept-webapp-service 8011:3001
+
+
+
+kubectl get all
+kubectl get pods
+kubectl logs <pod-name> -f
+kubectl logs <pod-name>
+kubectl delete deployment mysql-deployment
+kubectl delete pod <pod-name>
+
+
+
+
+Docker commands:-
+docker build -t departmentservice .
+here . is location of dockerfile
+
+docker tag departmentservice nikhil575/departmentservice:latest
+
+docker push nikhil575/departmentservice:latest
+
+
+docker build -t liquibase-with-dept-mysql-driver .
+docker tag liquibase-with-dept-mysql-driver nikhil575/liquibase-with-dept-mysql-driver:latest
+docker push nikhil575/liquibase-with-dept-mysql-driver:latest
+
+
+kubectl describe pod dept-webapp-deployment-6958c9cb7c-p9mpn
+
+
