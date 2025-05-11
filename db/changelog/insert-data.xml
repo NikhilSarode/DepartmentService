@@ -1,0 +1,18 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="3" author="nik">
+        <insert tableName="department">
+            <column name="name" value="HR"/>
+            <column name="description" value="HR department"/>
+        </insert>
+        <insert tableName="department">
+            <column name="name" value="IT"/>
+            <column name="description" value="Development department"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
