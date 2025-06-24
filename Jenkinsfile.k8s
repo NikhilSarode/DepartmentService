@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+
+    environment {
+        K8S_MANIFEST_DIR = 'k8s'
+        LIQUIBASE_JOB_NAME = 'dept-mysql-liquibase-job'       // Update if your job name differs
+        LIQUIBASE_NAMESPACE = 'default'            // Change if you're using a different namespace
+        DB_POD_LABEL = 'app=dept-mysql'                 // Adjust to match your MySQL pod label
+    }
+
+    stages {
+        stage('Deploy MySql DB') {
+            steps {
+                script {
+                    echo "Applying MySQL Kubernetes manifests..."
+                    bat "kubectl apply -f %K8S_MANIFEST_DIR%\\dept-mysql-config.yaml"
+                    bat "kubectl apply -f %K8S_MANIFEST_DIR%\\dept-mysql-secret.yaml"
+                    bat "kubectl apply -f %K8S_MANIFEST_DIR%\\dept-mysql.yaml"
+                }
+            }
+        }
+
+        stage('Wait for MySQL Pod') {
+            steps {
+                script {
+                    echo "Waiting for MySQL pod to be ready..."
+                    bat 'kubectl wait --for=condition=ready pod -l app=mysql --timeout=4500s'
+                }
+            }
+        }
+
+        stage('Liquibase migration') {
+            steps {
+                script {
+                    echo "Applying Liquibase job..."
+                    bat "kubectl delete job %LIQUIBASE_JOB_NAME% --ignore-not-found -n %LIQUIBASE_NAMESPACE%"
+                    bat "kubectl apply -f %K8S_MANIFEST_DIR%\\dept-mysql-liquibase-job.yaml"
+                }
+            }
+        }
+
+        stage('Wait for Liquibase Job') {
+            steps {
+                script {
+                    echo "Waiting for Liquibase job to complete..."
+                    def waitCommand = "kubectl wait --for=condition=complete --timeout=4500s job/%LIQUIBASE_JOB_NAME% -n %LIQUIBASE_NAMESPACE%"
+                    def result = bat(returnStatus: true, script: waitCommand)
+                    if (result != 0) {
+                        error("Liquibase job failed or timed out.")
+                    }
+                }
+            }
+        }
+
+        stage('Deploying App Server') {
+            steps {
+                script {
+                    echo "Applying App Server manifests..."
+                    bat "kubectl apply -f %K8S_MANIFEST_DIR%\\dept-webapp.yaml"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment to Minikube successful!'
+        }
+        failure {
+            echo 'Deployment failed.'
+        }
+    }
+}

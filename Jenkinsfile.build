@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+
+    tools {
+        gradle 'Gradle 8.6' // The name defined in Jenkins Global Tool Configuration
+	    jdk 'jdk-21'
+    }
+
+    environment {
+        JAVA_HOME = "${tool 'jdk-21'}"
+        PATH = "${JAVA_HOME}\\bin;${env.PATH}"
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/NikhilSarode/DepartmentService.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat '.\\gradlew.bat clean build'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                bat '.\\gradlew.bat test'
+            }
+        }
+
+        stage('Archive Artifact') {
+             steps {
+		bat 'copy build\\libs\\DepartmentService-0.0.1-SNAPSHOT.jar build\\libs\\app.jar'
+                archiveArtifacts artifacts: 'build/libs/app.jar', fingerprint: true
+             }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ App built and tests successful'
+        }
+        failure {
+            echo '❌ Build failed.'
+        }
+    }
+}
