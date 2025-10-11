@@ -16,6 +16,7 @@ public class DepartmentController {
 
     @PostMapping
     public Department saveDepartment(@RequestBody Department department) {
+        System.out.println("called saveDepartment");
         return departmentRepository.save(department);
     }
 
