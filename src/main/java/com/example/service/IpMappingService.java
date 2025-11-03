@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.couchbase.client.java.*;
+import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.query.QueryResult;
 import com.example.model.IpMapping;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,5 +80,29 @@ public class IpMappingService {
             e.printStackTrace();
             return List.of();
         }
+    }
+
+    public List<IpMapping> findByIp(long ip) {
+        String query = String.format(
+                "SELECT `from`, `to`, `country`, `state` FROM `config_data`.`reference_data`.`geoip_data` WHERE %d BETWEEN `from` AND `to`",
+                ip
+        );
+
+        QueryResult result = cluster.query(query);
+
+        List<IpMapping> mappings = result.rowsAsObject().stream()
+                .map(row -> {
+                    IpMapping ipMapping = new IpMapping();
+                    ipMapping.setFrom(row.getLong("from"));
+                    ipMapping.setTo(row.getLong("to"));
+                    ipMapping.setCountry(row.getString("country"));
+                    ipMapping.setState(row.getString("state"));
+                    return ipMapping;
+                })
+                .collect(Collectors.toList());
+
+        System.out.println("Fetched " + mappings.size() + " records from Couchbase for ip="+ip);
+
+        return mappings;
     }
 }
