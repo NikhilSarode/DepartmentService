@@ -4,10 +4,11 @@ import com.couchbase.client.java.*;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.query.QueryResult;
 import com.example.model.IpMapping;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;

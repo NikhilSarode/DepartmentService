@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Load Spring properties -->
+    <springProperty scope="context" name="appName" source="spring.application.name"/>
+
+    <!-- Include environment-specific file configs -->
+    <springProfile name="dev">
+        <include resource="logback-dev.xml"/>
+    </springProfile>
+
+    <springProfile name="prod">
+        <include resource="logback-prod.xml"/>
+    </springProfile>
+</configuration>
